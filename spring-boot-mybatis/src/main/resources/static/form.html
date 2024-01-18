@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management Form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input {
+            width: calc(100% - 16px);
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #userList, #userDetails {
+            margin-top: 20px;
+            max-width: 400px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #userList h3, #userDetails h3 {
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 600px) {
+            form {
+                max-width: 100%;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+<h2>User Management Form</h2>
+
+<!-- Add User Form -->
+<form id="addUserForm">
+    <label for="addUserId">ID:</label>
+    <input type="number" id="addUserId" name="addUserId" required>
+
+    <label for="addUserName">Name:</label>
+    <input type="text" id="addUserName" name="addUserName" required>
+
+    <label for="addUserSal">Salary:</label>
+    <input type="number" id="addUserSal" name="addUserSal" required>
+
+    <button type="button" onclick="addUser()">Add User</button>
+</form>
+
+<!-- Update User Form -->
+<form id="updateUserForm">
+    <label for="updateUserId">User ID for Update:</label>
+    <input type="number" id="updateUserId" name="updateUserId" required>
+
+    <label for="updateUserName">New Name:</label>
+    <input type="text" id="updateUserName" name="updateUserName" required>
+
+    <label for="updateUserSal">New Salary:</label>
+    <input type="number" id="updateUserSal" name="updateUserSal" required>
+
+    <button type="button" onclick="updateUser()">Update User</button>
+</form>
+
+<!-- Delete User Form -->
+<form id="deleteUserForm">
+    <label for="deleteUserId">User ID for Delete:</label>
+    <input type="number" id="deleteUserId" name="deleteUserId" required>
+
+    <button type="button" onclick="deleteUser()">Delete User</button>
+</form>
+
+<!-- Get User Form -->
+<form id="getUserForm">
+    <label for="getUserId">User ID for Get:</label>
+    <input type="number" id="getUserId" name="getUserId" required>
+    <button type="button" onclick="getUser()">Get User</button>
+</form>
+
+<!-- Get All Users Section -->
+<div id="userList">
+    <h3>All Users</h3>
+    <ul id="allUsersList"></ul>
+</div>
+
+<!-- Get User Details Section -->
+<div id="userDetails">
+    <h3>User Details</h3>
+    <ul id="userDetailsList"></ul>
+</div>
+
+<script>
+    // Function to handle adding a user
+    function addUser() {
+        const addUserId = document.getElementById("addUserId").value;
+        const addUserName = document.getElementById("addUserName").value;
+        const addUserSal = document.getElementById("addUserSal").value;
+
+        const data = { id: addUserId, name: addUserName, sal: addUserSal };
+
+        fetch("/api/users/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            alert("User added successfully!");
+        })
+        .catch(error => {
+            console.error("Error adding user:", error);
+            alert("Failed to add user.");
+        });
+    }
+
+    // Function to handle updating a user
+    function updateUser() {
+        const updateUserId = document.getElementById("updateUserId").value;
+        const updateUserName = document.getElementById("updateUserName").value;
+        const updateUserSal = document.getElementById("updateUserSal").value;
+
+        const data = { name: updateUserName, sal: updateUserSal };
+
+        fetch(`/api/users/update/${updateUserId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            alert(data);
+        })
+        .catch(error => {
+            console.error("Error updating user:", error);
+            alert("Failed to update user.");
+        });
+    }
+
+    // Function to handle deleting a user
+    function deleteUser() {
+        const deleteUserId = document.getElementById("deleteUserId").value;
+
+        fetch(`/api/users/delete/${deleteUserId}`, {
+            method: "DELETE"
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            alert("User deleted successfully!");
+        })
+        .catch(error => {
+            console.error("Error deleting user:", error);
+            alert("Failed to delete user.");
+        });
+    }
+
+    // Function to get a specific user
+    function getUser() {
+        const getUserId = document.getElementById("getUserId").value;
+
+        fetch(`/api/users/${getUserId}`)
+        .then(response => response.json())
+        .then(user => {
+            const userDetailsList = document.getElementById("userDetailsList");
+            userDetailsList.innerHTML = ""; // Clear existing list
+
+            const listItem = document.createElement("li");
+            listItem.textContent = `ID: ${user.id}, Name: ${user.name}, Salary: ${user.sal}`;
+            userDetailsList.appendChild(listItem);
+        })
+        .catch(error => {
+            console.error("Error getting user:", error);
+        });
+    }
+
+    // Function to get all users
+    function getAllUsers() {
+        fetch("/api/users/all")
+        .then(response => response.json())
+        .then(users => {
+            const userList = document.getElementById("allUsersList");
+            userList.innerHTML = ""; // Clear existing list
+
+            users.forEach(user => {
+                const listItem = document.createElement("li");
+                listItem.textContent = `ID: ${user.id}, Name: ${user.name}, Salary: ${user.sal}`;
+                userList.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            console.error("Error getting all users:", error);
+        });
+    }
+
+    // Initial call to get all users
+    getAllUsers();
+</script>
+
+</body>
+</html>

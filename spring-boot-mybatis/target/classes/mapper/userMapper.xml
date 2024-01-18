@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- src/main/resources/mappers/UserMapper.xml -->
+<mapper namespace="com.mybatis.springbootmybatis2.mapper.Usermapper">
+
+    <resultMap id="userResultMap" type="com.mybatis.springbootmybatis2.model.User">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sal" column="sal"/>
+    </resultMap>
+
+    <select id="getAll" resultMap="userResultMap">
+        SELECT user.id, user.name, user.sal, puja.id, puja.name, puja.rollno
+        FROM user
+        INNER JOIN puja ON user.id = puja.user_id;
+    </select>
+
+
+    <insert id="insertUser" parameterType="com.mybatis.springbootmybatis2.model.User">
+        INSERT INTO user (id,name, sal) VALUES (#{id},#{name}, #{sal})
+    </insert>
+
+    <select id="getUserById" parameterType="int" resultMap="userResultMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <update id="updateUser" parameterType="com.mybatis.springbootmybatis2.model.User">
+        UPDATE user SET name = #{name}, sal = #{sal} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteUser" parameterType="int">
+        DELETE FROM user WHERE id = #{id}
+    </delete>
+
+</mapper>
